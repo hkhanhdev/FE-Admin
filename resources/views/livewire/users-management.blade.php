@@ -9,7 +9,7 @@ new #[Layout("layouts.app")]
 class extends Component {
     use Toast;
     public $addDrawer = false;
-    public $editDrawer = false;
+    public $editDrawerr = false;
     public $usr = [];
     public $role = [
         [
@@ -43,7 +43,7 @@ class extends Component {
 
     public function updateRole()
     {
-        $res = \Illuminate\Support\Facades\Http::put($this->update_endpoint.$this->usr['id'],['token'=>$this->access_token,'role'=>$this->usr['roles']])->json();
+        $res = \Illuminate\Support\Facades\Http::put($this->update_endpoint.$this->usr['id'],['token'=>session()->get('access_token'),'role'=>$this->usr['roles']])->json();
         if ($res['status_code'] == 200) {
             $this->success("Updated!");
         }else {
@@ -61,9 +61,11 @@ class extends Component {
     }
     public function openEditDrawer($id)
     {
-        $res = \Illuminate\Support\Facades\Http::post($this->detail_endpoint,['token'=>$this->access_token,'id'=>$id])->json();
+//        dd(session()->get('access_token'));
+        $res = \Illuminate\Support\Facades\Http::post($this->detail_endpoint,['token'=>session()->get('access_token'),'id'=>$id])->json();
         $this->usr = $res['data'];
-        $this->editDrawer = true;
+//        dd($this->usr);
+        $this->editDrawerr = true;
     }
 
     public function with(): array
@@ -87,7 +89,7 @@ class extends Component {
 
 <div class="py-12">
     <x-ui-drawer
-        wire:model="editDrawer"
+        wire:model="editDrawerr"
         title="Update user information"
         subtitle="Livewire"
         separator
@@ -119,7 +121,7 @@ class extends Component {
                         <th>Phone</th>
                         <th>Address</th>
                         <th>Role</th>
-                        <th></th>
+                        <th><x-ui-button label="Open Left" wire:click="$toggle('showDrawer1')" /></th>
                     </tr>
                     </thead>
                     <tbody>
