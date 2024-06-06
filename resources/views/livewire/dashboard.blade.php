@@ -6,9 +6,9 @@ use Livewire\Attributes\Layout;
 new #[Layout("layouts.app")]
 class extends Component {
     //
+    protected $access_token;
     protected $db_endpoint = 'http://127.0.0.1:8000/api/v1/admin/dash_board';
     protected $rev_endpoint = "http://127.0.0.1:8000/api/v1/admin/get_all_revenue?month=";
-    protected $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL3YxL2xvZ2luIiwiaWF0IjoxNzE3MzE2NTI4LCJleHAiOjE3MTkxMTY1MjgsIm5iZiI6MTcxNzMxNjUyOCwianRpIjoibnJSajJSMHNLVHpIV0VHVSIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0._o7chwAuJfqqD2P7bFc9ZomefJqqfjirGHaOTimOf2g";
     public array $myChart = [
         'type' => 'bar',
         'data' => [
@@ -24,7 +24,8 @@ class extends Component {
 
     protected function dashboard()
     {
-        $res = \Illuminate\Support\Facades\Http::get($this->db_endpoint,['token'=>$this->token])->json();
+        $this->access_token = session()->get("access_token");
+        $res = \Illuminate\Support\Facades\Http::get($this->db_endpoint,['token'=>$this->access_token])->json();
 //        dd($res);
         return $res['data'];
     }
@@ -32,7 +33,7 @@ class extends Component {
     {
         $i = 1;
         while($i <= 12) {
-            $res = \Illuminate\Support\Facades\Http::get($this->rev_endpoint.$i,['token'=>$this->token])->json();
+            $res = \Illuminate\Support\Facades\Http::get($this->rev_endpoint.$i,['token'=>$this->access_token])->json();
             if (empty($res['data'])) {
                 $rand_rev = fake()->randomNumber(4);
                 $this->myChart['data']['datasets'][0]['data'][] = $rand_rev;

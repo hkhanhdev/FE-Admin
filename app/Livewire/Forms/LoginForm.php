@@ -31,14 +31,23 @@ class LoginForm extends Form
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
-        $res = Http::post($this->auth_endpoint,['email'=>$this->only('email'),'password'=>$this->only("password")])->json();
-        dd($res);
-        if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
-            RateLimiter::hit($this->throttleKey());
+        $validated_credentials = $this->only(['email','password']);
+        $res = Http::post($this->auth_endpoint,['email'=>$validated_credentials['email'],'password'=>$validated_credentials['password']])->json();
+//        dd($res);
 
+//        if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
+//            RateLimiter::hit($this->throttleKey());
+//            throw ValidationException::withMessages([
+//                'form.email' => trans('auth.failed'),
+//            ]);
+//        }
+        if ((isset($res['status']) && $res['status'] == 401) || (isset($res['access_token']) && $res['user_role'] == 0)) {
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'form.email' => trans('auth.failed'),
             ]);
+        }elseif (isset($res['access_token']) && $res['user_role'] == 1) {
+            session()->put(['access_token'=>$res['access_token']]);
         }
 
         RateLimiter::clear($this->throttleKey());

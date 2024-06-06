@@ -21,11 +21,10 @@ class extends Component {
             'name' => 'Admin'
         ]
     ];
-
+    protected $access_token;
     protected $update_endpoint = "http://127.0.0.1:8000/api/v1/admin/user/"; //PUT
     protected $usr_endpoint = "http://127.0.0.1:8000/api/v1/admin/get_all_users";
     protected $detail_endpoint = "http://127.0.0.1:8000/api/v1/admin/get_detail_user"; //POST
-    protected $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL3YxL2xvZ2luIiwiaWF0IjoxNzE3MzE2NTI4LCJleHAiOjE3MTkxMTY1MjgsIm5iZiI6MTcxNzMxNjUyOCwianRpIjoibnJSajJSMHNLVHpIV0VHVSIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0._o7chwAuJfqqD2P7bFc9ZomefJqqfjirGHaOTimOf2g";
 
     #[On("toNextPage")]
     public function nextPage($endpoint)
@@ -44,7 +43,7 @@ class extends Component {
 
     public function updateRole()
     {
-        $res = \Illuminate\Support\Facades\Http::put($this->update_endpoint.$this->usr['id'],['token'=>$this->token,'role'=>$this->usr['roles']])->json();
+        $res = \Illuminate\Support\Facades\Http::put($this->update_endpoint.$this->usr['id'],['token'=>$this->access_token,'role'=>$this->usr['roles']])->json();
         if ($res['status_code'] == 200) {
             $this->success("Updated!");
         }else {
@@ -55,13 +54,14 @@ class extends Component {
 
     protected function getUsers()
     {
-        $res = \Illuminate\Support\Facades\Http::get($this->usr_endpoint,['token'=>$this->token])->json();
+        $this->access_token = session()->get('access_token');
+        $res = \Illuminate\Support\Facades\Http::get($this->usr_endpoint,['token'=>$this->access_token])->json();
 //        dd($res);
         return $res['data'];
     }
     public function openEditDrawer($id)
     {
-        $res = \Illuminate\Support\Facades\Http::post($this->detail_endpoint,['token'=>$this->token,'id'=>$id])->json();
+        $res = \Illuminate\Support\Facades\Http::post($this->detail_endpoint,['token'=>$this->access_token,'id'=>$id])->json();
         $this->usr = $res['data'];
         $this->editDrawer = true;
     }

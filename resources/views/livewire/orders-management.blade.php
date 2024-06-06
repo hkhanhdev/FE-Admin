@@ -11,9 +11,9 @@ new #[Layout("layouts.app")]
 class extends Component {
     //
     use Toast;
+    protected $access_token;
     protected $ords_endpoint = "http://127.0.0.1:8000/api/v1/admin/get_all_orders?orderBy=DESC&perPage=2";
     protected $upt_endpoint = "http://127.0.0.1:8000/api/v1/admin/update_status_order";
-    protected $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL3YxL2xvZ2luIiwiaWF0IjoxNzE3MzE2NTI4LCJleHAiOjE3MTkxMTY1MjgsIm5iZiI6MTcxNzMxNjUyOCwianRpIjoibnJSajJSMHNLVHpIV0VHVSIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0._o7chwAuJfqqD2P7bFc9ZomefJqqfjirGHaOTimOf2g";
 
     public $select_ordID;
     public $select_status;
@@ -56,7 +56,7 @@ class extends Component {
 
     public function updateOrd()
     {
-        $res = \Illuminate\Support\Facades\Http::post($this->upt_endpoint,['token'=>$this->token,'id'=>$this->select_ordID,'status'=>$this->select_status])->json();
+        $res = \Illuminate\Support\Facades\Http::post($this->upt_endpoint,['token'=>$this->access_token,'id'=>$this->select_ordID,'status'=>$this->select_status])->json();
         if ($res['status_code'] == 200) {
             $this->success("Update status successfully!");
             $this->editDrawer = false;
@@ -74,7 +74,8 @@ class extends Component {
     }
     protected function getOrders()
     {
-        $res = \Illuminate\Support\Facades\Http::get($this->ords_endpoint,['token'=>$this->token])->json();
+        $this->access_token = session()->get("access_token");
+        $res = \Illuminate\Support\Facades\Http::get($this->ords_endpoint,['token'=>$this->access_token])->json();
         return $res['data'];
     }
     public function with():array
