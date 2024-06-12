@@ -56,7 +56,7 @@ class extends Component {
 
     public function updateOrd()
     {
-        $res = \Illuminate\Support\Facades\Http::post($this->upt_endpoint,['token'=>$this->access_token,'id'=>$this->select_ordID,'status'=>$this->select_status])->json();
+        $res = \Illuminate\Support\Facades\Http::post($this->upt_endpoint,['token'=>session()->get("access_token"),'id'=>$this->select_ordID,'status'=>$this->select_status])->json();
         if ($res['status_code'] == 200) {
             $this->success("Update status successfully!");
             $this->editDrawer = false;
@@ -81,6 +81,7 @@ class extends Component {
     public function with():array
     {
         $data = $this->getOrders();
+//        dd($data);
         return [
             'orders' => $data
         ];
@@ -114,7 +115,7 @@ class extends Component {
 
         <x-slot:actions>
             <x-ui-button label="Cancel" @click="$wire.editDrawer = false" />
-            <x-ui-button label="Update" class="btn-primary" icon="o-check" wire:click="updateOrd()"/>
+            <x-ui-button label="Update" class="btn-primary" icon="o-check" wire:click="updateOrd()" spinner/>
         </x-slot:actions>
     </x-ui-drawer>
     <div class="w-full mx-auto sm:px-6 lg:px-8">
@@ -148,7 +149,21 @@ class extends Component {
                             <td>{{$order['address']}}</td>
                             <td>{{$order['phone_number']}}</td>
                             <td>{{$order['total_bill']}}</td>
-                            <td>{{$order['status_order']}}</td>
+                            <td>
+                                @if($order['status_order'] == 1)
+                                    <x-ui-badge value="Pending" class="badge-warning" />
+                                @elseif($order['status_order'] == 5)
+                                    <x-ui-badge value="Canceled" class="badge-error" />
+                                @elseif($order['status_order'] == 2)
+                                    <x-ui-badge value="Delivering" class="badge-success" />
+                                @elseif($order['status_order'] == 3)
+                                    <x-ui-badge value="Delivered" class="badge-success" />
+                                @elseif($order['status_order'] == 4)
+                                    <x-ui-badge value="Completed" class="badge-success" />
+                                @else
+                                    <x-ui-badge value="User" class="badge-primary" />
+                                @endif
+                            </td>
                             <td>
                                 <x-ui-button label="Edit" icon="o-pencil-square" responsive class="btn-warning" spinner wire:click="openEditDrawer({{$order['id']}},{{$order['status_order']}})"/>
                             </td>
