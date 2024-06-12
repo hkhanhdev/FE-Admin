@@ -8,7 +8,7 @@ use Livewire\Attributes\On;
 new #[Layout("layouts.app")]
 class extends Component {
     use Toast;
-    public $addDrawer = false;
+
     public $editDrawerr = false;
     public $usr = [];
     public $role = [
@@ -121,7 +121,7 @@ class extends Component {
                         <th>Phone</th>
                         <th>Address</th>
                         <th>Role</th>
-                        <th><x-ui-button label="Open Left" wire:click="$toggle('showDrawer1')" /></th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
