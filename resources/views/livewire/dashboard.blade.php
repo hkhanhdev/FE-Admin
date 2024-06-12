@@ -8,7 +8,8 @@ class extends Component {
     //
     protected $access_token;
     protected $db_endpoint = 'http://127.0.0.1:8000/api/v1/admin/dash_board';
-    protected $rev_endpoint = "http://127.0.0.1:8000/api/v1/admin/get_all_revenue?month=";
+    protected $rev_endpoint = "http://127.0.0.1:8000/api/v1/admin/get_revenue";
+    protected $month_rev;
     public array $myChart = [
         'type' => 'bar',
         'data' => [
@@ -31,17 +32,19 @@ class extends Component {
     }
     protected function makeChart()
     {
-        $i = 1;
-        while($i <= 12) {
-            $res = \Illuminate\Support\Facades\Http::get($this->rev_endpoint.$i,['token'=>$this->access_token])->json();
-            if (empty($res['data'])) {
-                $rand_rev = fake()->randomNumber(4);
-                $this->myChart['data']['datasets'][0]['data'][] = $rand_rev;
-            }else {
-                $this->myChart['data']['datasets'][0]['data'][] = $res['data'];
-            }
-            $i++;
+
+        $res = \Illuminate\Support\Facades\Http::get($this->rev_endpoint,['token'=>$this->access_token,'year'=>2024])->json();
+        foreach ($res['data'] as $m) {
+//            if ($m['total_revenue'] == 0) {
+//                $rand_rev = fake()->randomNumber(3);
+//                $this->myChart['data']['datasets'][0]['data'][] = $rand_rev;
+//            }else {
+//                $this->myChart['data']['datasets'][0]['data'][] = $m['total_revenue'];
+//            }
+            $this->myChart['data']['datasets'][0]['data'][] = $m['total_revenue'];
         }
+        $this->month_rev = $this->myChart['data']['datasets'][0]['data'][5];
+//        dd($this->myChart['data']['datasets'][0]['data']);
     }
     public function with(): array
     {
@@ -49,7 +52,7 @@ class extends Component {
         $this->makeChart();
         return [
             "users" => $data['users'],
-            "revenue" => "1.000.000",
+            "revenue" => $this->month_rev,
             "orders" => $data['orders'],
             'products' => $data['products']
         ];
