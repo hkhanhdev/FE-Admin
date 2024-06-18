@@ -137,7 +137,9 @@ class extends Component {
                         <th>Order ID</th>
                         <th>Product image</th>
                         <th>Product name</th>
-                        <th>Price</th>
+                        <th>Manu</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
                         <th>Customer Name</th>
                         <th>Address</th>
                         <th>Phone</th>
@@ -152,6 +154,7 @@ class extends Component {
                     @forelse($orders['pagination_data'] as $order)
                         <tr>
                             <th>{{$order['id']}}</th>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -175,7 +178,7 @@ class extends Component {
                                 @endif
                             </td>
                             <td>
-                                <x-ui-button label="Edit" icon="o-pencil-square" responsive class="btn-warning" spinner wire:click="openEditDrawer({{$order['id']}},'{{$order['status_order']}}')"/>
+                                <x-ui-button label="Edit" icon="o-pencil-square" responsive class="btn-warning" spinner wire:click="openEditDrawer({{$order['id']}},'{{$order['status_order']}}')" spinner/>
                             </td>
                         </tr>
                         @foreach(json_decode($order['products_cart'],true) as $item)
@@ -185,6 +188,8 @@ class extends Component {
                                     <img src="{{$item['image']}}" alt="Logo" class="h-20">
                                 </td>
                                 <td>{{$item['name']}}</td>
+                                <th>{{$item['manufacturer']}}</th>
+                                <td>{{$item['quantity']}}</td>
                                 <td>{{$item['price']}}</td>
                             </tr>
                         @endforeach
@@ -197,6 +202,5 @@ class extends Component {
                 </table>
             </div>
         </div>
-        <livewire:pagination :data="$orders"/>
     </div>
 </div>

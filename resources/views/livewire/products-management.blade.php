@@ -94,6 +94,8 @@ class extends Component {
     }
     public function openAddDrawer()
     {
+        $manu_res = \Illuminate\Support\Facades\Http::get("http://127.0.0.1:8000/api/v1/manufacturers?perPage=100")->json();
+        $this->manus = $manu_res['data']['pagination_data'];
         $this->addDrawer = true;
     }
     public function with(): array
@@ -238,7 +240,7 @@ class extends Component {
 
         <x-slot:actions>
             <x-ui-button label="Cancel" @click="$wire.editDrawer = false" />
-            <x-ui-button label="Update" class="btn-primary" icon="o-check" wire:click="updatePrd()"/>
+            <x-ui-button label="Update" class="btn-primary" icon="o-check" wire:click="updatePrd()" spinner/>
         </x-slot:actions>
     </x-ui-drawer>
     <div class="w-full mx-auto sm:px-6 lg:px-8">
